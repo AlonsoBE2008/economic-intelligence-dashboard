@@ -122,6 +122,23 @@ def pagina_indicadores(datos: dict[str, pd.DataFrame]) -> None:
 
     st.dataframe(resumen_descriptivo(datos), use_container_width=True)
 
+    st.divider()
+    st.subheader("📄 Exportar Reporte")
+    if st.button("Generar Reporte PDF"):
+        with st.spinner("Generando PDF..."):
+            from src.reports.pdf_generator import generar_reporte_pdf
+            from src.models.econometrics import calcular_indice_riesgo
+            riesgo = calcular_indice_riesgo(datos)
+            ruta = generar_reporte_pdf(datos, riesgo)
+            with open(ruta, "rb") as f:
+                pdf_bytes = f.read()
+        st.download_button(
+            label="⬇️ Descargar PDF",
+            data=pdf_bytes,
+            file_name="reporte_economico.pdf",
+            mime="application/pdf"
+        )
+
 
 def pagina_proyecciones(datos: dict[str, pd.DataFrame]) -> None:
     """Página de proyecciones ARIMA con intervalo de confianza al 95%."""
